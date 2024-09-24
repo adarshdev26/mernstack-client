@@ -165,3 +165,11 @@
   align-items: center;
   margin-bottom: 8px; /* Optional: adjust spacing between items */
 }
+
+.hand-cursor {
+  cursor: pointer;
+  /* Additional styling for the element */
+  background-color: #f0f0f0;
+  border: 1px solid #ccc;
+  padding: 5px;
+}

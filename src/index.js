@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
-import { CartProvider } from './context/cartContext';
+import { CartProvider } from './context/CartContext'; 
 import { RestaurantProvider } from './context/restaurentContext';
 import { RegisteruserProvider } from "./context/registerusersContext";
 import './index.css';

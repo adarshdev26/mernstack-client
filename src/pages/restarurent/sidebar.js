@@ -16,8 +16,8 @@ const Sidebar = () => {
 const navigate = useNavigate()
 
 const handleLogout = ()=> {
- sessionStorage.removeItem('username','role');
- navigate('/');
+ sessionStorage.removeItem('username','role','id');
+ navigate('/:id');
 }
 
   return (
@@ -38,54 +38,30 @@ const handleLogout = ()=> {
       open
     >
       <List>
-        <ListItem button component={Link} to="/dashboard">
+        <ListItem button component={Link} to="/owner_dashboard">
           <ListItemIcon sx={{ color: '#f5f6fa' }}>
             <DashboardIcon />
           </ListItemIcon>
           <ListItemText primary="Dashboard Overview" />
         </ListItem>
 
-        <ListItem button component={Link} to="/registerrestaurant">
-          <ListItemIcon sx={{ color: '#f5f6fa' }}>
-            <RestaurantIcon />
-          </ListItemIcon>
-          <ListItemText primary="Restaurants" />
-        </ListItem>
+        
 
-        <ListItem button component={Link} to="/menuitems">
+        <ListItem button component={Link} to="#">
           <ListItemIcon sx={{ color: '#f5f6fa' }}>
             <MenuBookIcon />
           </ListItemIcon>
           <ListItemText primary="Manage Menu" />
         </ListItem>
 
-        <ListItem button component={Link} to="/admin_orders">
+        <ListItem button component={Link} to="/orders">
           <ListItemIcon sx={{ color: '#f5f6fa' }}>
             <ShoppingCartIcon />
           </ListItemIcon>
           <ListItemText primary="Orders" />
         </ListItem>
 
-        <ListItem button>
-          <ListItemIcon sx={{ color: '#f5f6fa' }}>
-            <PeopleIcon />
-          </ListItemIcon>
-          <ListItemText primary="Reservations" />
-        </ListItem>
-
-        <ListItem button component={Link} to="/registerusers">
-          <ListItemIcon sx={{ color: '#f5f6fa' }}>
-            <PeopleIcon />
-          </ListItemIcon>
-          <ListItemText primary="Users" />
-        </ListItem>
-
-        <ListItem button>
-          <ListItemIcon sx={{ color: '#f5f6fa' }}>
-            <BarChartIcon />
-          </ListItemIcon>
-          <ListItemText primary="Reports" />
-        </ListItem>
+      
 
         <ListItem button>
           <ListItemIcon sx={{ color: '#f5f6fa' }}>

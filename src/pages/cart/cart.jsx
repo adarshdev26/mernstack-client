@@ -1,102 +1,99 @@
-import React, { useContext } from 'react';
-import { CartContext } from '../../context/cartContext'; // Adjust the path as needed
-import { Box, Divider, Typography, Button, List, ListItem } from '@mui/material';
+import React from 'react';
+import { Box, Divider, Typography, Button, List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+import { useCart } from '../../context/CartContext';
+import { useNavigate } from 'react-router-dom';
 
 const Cart = () => {
-  const { cart } = useContext(CartContext);
+  const { cart, cartTotal } = useCart(); 
+  const navigate = useNavigate();
 
-  const totalAmount = cart.reduce((total, item) => {
-    return total + item.price * item.quantity;
-  }, 0);
+
+  const newuser = sessionStorage.getItem('id');
+
+
+  
+  const handlePurchase = async () => {
+    try {
+      const response = await fetch('http://localhost:5000/api/order', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          restaurantId: newuser,
+          items: cart.map(item => ({
+            itemTitle: item.itemTitle,
+            quantity: item.quantity,
+            price: item.itemPrice,
+          })),
+          totalAmount: cartTotal,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to place order');
+      }
+
+      const data = await response.json();
+      console.log('Order placed successfully:', data);
+      sessionStorage.removeItem('id');
+
+      setTimeout(() => {
+        navigate('/success');
+      }, 500);
+    } catch (error) {
+      console.error('Error placing order:', error);
+    }
+  };
+
+
+
 
   return (
-    <Box sx={{ p: 3, maxWidth: '800px', margin: '0 auto', mt: 4 }}>
-      <Typography variant='h4' align='center' gutterBottom>
-        Cart Items
+    <Box
+      sx={{
+        width: '100%',
+        padding: 2,
+        margin: 'auto',
+        maxWidth: 600, // Set a maximum width for responsiveness
+        backgroundColor: '#f5f5f5',
+        borderRadius: 4,
+        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+      }}
+    >
+      <Typography variant="h5" gutterBottom align="center">
+        Your Shopping Cart
       </Typography>
 
-      {cart.length === 0 ? (
-        <Typography variant='body1' align='center'>
-          Your cart is empty.
-        </Typography>
-      ) : (
-        <List>
-          {cart.map((item, index) => (
-            <ListItem 
-              key={index} 
-              sx={{ 
-                borderBottom: '1px solid #ccc', 
-                mb: 2, 
-                p: 2, 
-                borderRadius: '8px',
-                bgcolor: 'background.paper',
-                boxShadow: 2 
-              }}
-            >
-              <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
-                <Typography variant='h6'>{item.name}</Typography>
-                <Typography variant='body2' color='textSecondary'>
-                  Price: ${item.price}
-                </Typography>
-                <Typography variant='body2' color='textSecondary'>
-                  Quantity: {item.quantity}
-                </Typography>
-              </Box>
-            </ListItem>
-          ))}
-        </List>
-      )}
+      <Divider />
 
-      <Box 
-        component="section" 
-        sx={{ 
-          mt: 4, 
-          p: 3, 
-          border: '1px solid #ccc', 
-          borderRadius: '8px', 
-          bgcolor: 'background.paper', 
-          boxShadow: 3 
-        }}
-      >
-        <Typography variant='h4' align='center' gutterBottom>
-          Summary
-        </Typography>
-        
-        <List sx={{ mb: 2 }}>
-          <ListItem disableGutters>
-            <Typography variant='body2' component="span" sx={{ fontWeight: 'bold' }}>Subtotal:</Typography>
-            <Typography variant='body2' component="span" sx={{ ml: 1 }}>${totalAmount.toFixed(2)}</Typography>
+      {/* Display cart items */}
+      <List dense>
+        {cart.map((item, index) => (
+          <ListItem key={item._id} sx={{ display: 'flex', justifyContent: 'space-between' }}>
+            <ListItemIcon>
+              <ShoppingCartIcon color="primary" />
+            </ListItemIcon>
+            <ListItemText
+              primary={item.itemTitle}
+              secondary={`Qty: ${item.quantity} - $${item.itemPrice * item.quantity}`}
+            />
           </ListItem>
-          <ListItem disableGutters>
-            <Typography variant='body2' component="span" sx={{ fontWeight: 'bold' }}>Discount:</Typography>
-            <Typography variant='body2' component="span" sx={{ ml: 1 }}>-$0.00</Typography>
-          </ListItem>
-          <ListItem disableGutters>
-            <Typography variant='body2' component="span" sx={{ fontWeight: 'bold' }}>Shipping & Handling:</Typography>
-            <Typography variant='body2' component="span" sx={{ ml: 1 }}>$0.00</Typography>
-          </ListItem>
-          <ListItem disableGutters>
-            <Typography variant='body2' component="span" sx={{ fontWeight: 'bold' }}>Tax (Calculated at checkout):</Typography>
-            <Typography variant='body2' component="span" sx={{ ml: 1 }}>$0.00</Typography>
-          </ListItem>
-        </List>
+        ))}
+      </List>
 
-        <Divider sx={{ mb: 2 }} />
+      <Divider />
 
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3 }}>
-          <Typography variant='h5'>Balance</Typography>
-          <Typography variant='h5'>${totalAmount.toFixed(2)}</Typography>
-        </Box>
-
-        <Button 
-          variant="contained" 
-          color="primary" 
-          fullWidth 
-          sx={{ py: 1.5, fontSize: '16px', textTransform: 'none' }}
-        >
-          Checkout
-        </Button>
+      {/* Display total amount */}
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: 2 }}>
+        <Typography variant="h6">Total:</Typography>
+        <Typography variant="h6">${cartTotal}</Typography>
       </Box>
+
+      <Button onClick={handlePurchase} variant="contained" color="primary" fullWidth sx={{ marginTop: 2 }}>
+        Confirm Purchase
+      </Button>
     </Box>
   );
 };

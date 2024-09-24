@@ -9,6 +9,7 @@
     "@material-tailwind/react": "^2.1.10",
     "@mui/icons-material": "^5.16.7",
     "@mui/material": "^5.16.7",
+    "@mui/x-data-grid": "^7.17.0",
     "@mui/x-date-pickers": "^7.16.0",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
@@ -55,8 +56,8 @@
   },
   "devDependencies": {
     "autoprefixer": "^10.4.20",
-    "postcss": "^8.4.45",
-    "tailwindcss": "^3.4.10"
+    "postcss": "^8.4.47",
+    "tailwindcss": "^3.4.11"
   },
-    "proxy": "http://localhost:5000"
+  "proxy": "http://localhost:5000"
 }

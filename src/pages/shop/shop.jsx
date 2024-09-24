@@ -1,5 +1,4 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { Link } from 'react-router-dom';
 import axios from "axios";
 import Accordion from '@mui/material/Accordion';
 import AccordionDetails from '@mui/material/AccordionDetails';
@@ -12,10 +11,6 @@ import Button from '@mui/material/Button';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import { Drawer, Typography } from '@mui/material';
-import { CartContext } from '../../context/cartContext';
-import RemoveIcon from '@mui/icons-material/Remove';
-import DeleteIcon from '@mui/icons-material/Delete';
-import EditIcon from '@mui/icons-material/Edit';
 import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
 import Snackbar from '@mui/material/Snackbar';
@@ -23,23 +18,19 @@ import Grid from "@mui/material/Grid";
 import { useParams } from 'react-router-dom';
 import './shop.css';
 import TextField from '@mui/material/TextField';
-import Navbar from '../../components/navbar';
-import Footer from '../../components/footer';
-import Closedimg from './assets/images/close.png'
-import pickup from "./assets/images/pickup.png"
-import IconButton from '@mui/material/IconButton';
-import CloseIcon from '@mui/icons-material/Close';
 import Checkbox from '@mui/material/Checkbox';
 import Sidebaraddtocart from '../../components/sidebaraddtocart';
-const Shop = (props) => {
+import { useCart } from '../../context/CartContext';
+import HomeIcon from '@mui/icons-material/Home';
+import PhoneIcon from '@mui/icons-material/Phone';
+import AccessTimeFilledIcon from '@mui/icons-material/AccessTimeFilled';
+const Shop = () => {
 
-
-  
   const { id } = useParams();
   const [open, setOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState([]);
-  const { cart, setCart } = useContext(CartContext);
-  const [quantity, setQuantity] = useState(1);const [editDialogOpen, setEditDialogOpen] = useState(false);
+  //const [quantity, setQuantity] = useState(1);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [editItem, setEditItem] = useState(null);
   const [selectedExtra, setselectedExtra] = useState([]);
   const [message, setMessage] = useState('');
@@ -61,6 +52,16 @@ const Shop = (props) => {
  const [itemsByCategory, setItemsByCategory] = useState([]);
  const [openDialog, setDialog] = useState(false);
  const [filteredItems, setFilteredItems] = useState([]);
+ const [productDetails, setProductDetails] = useState(null);
+ const [expanded, setExpanded] = useState([]);
+ const [selectedModifier, setSelectedModifier] = useState([]);
+
+ const { addToCart, cartTotal } = useCart(); // Get the addToCart function from context
+ const [quantity, setQuantity] = useState(1);
+
+
+
+
 
 
 
@@ -79,12 +80,16 @@ const Shop = (props) => {
 }, [id]);
 
 
+
+
+
  
+
+
 useEffect(() => {
   axios.get(`http://localhost:5000/api/restaurants/${id}`)
     .then((response) => {
       const deliveryTimes = response.data.deliveryTimes;
-      
       const formatTime = (isoString) => {
         const date = new Date(isoString);
         return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -106,6 +111,8 @@ useEffect(() => {
       console.log(error);
     });
 }, [id]);
+
+
 
 
 useEffect(() => {
@@ -134,6 +141,9 @@ useEffect(() => {
     fetchCategories();
   }
 }, [menuId]);
+
+
+
 
 
   useEffect(() => {
@@ -168,6 +178,9 @@ useEffect(() => {
   }, [menuId]);
   
 
+
+
+
   useEffect(() => {
     const fetchItemsForCategories = async () => {
       try {
@@ -185,8 +198,9 @@ useEffect(() => {
             fetchedItems.filter(item => item.categoryId === category._id)
           )
         );
-        console.log(itemsByCategory, "this is items")
+       console.log(itemsByCategory, "this is items");
         setItemsByCategory(itemsByCategory);
+        
   
       } catch (error) {
         console.error("Error fetching items:", error);
@@ -199,40 +213,36 @@ useEffect(() => {
   }, [categoriesByMenu]);
   
   
-  
+
+
 
  
-  
   const handleClickOpen = (item) => {
-    setSelectedProduct((prevCart) => [...prevCart, item]);
-
-    setOpen(true);
+    setProductDetails(item); 
+    setOpen(true);    
+    setQuantity(1);      
   };
 
-console.log(selectedProduct, "this is selected produts")
+
+console.log('this is product', productDetails)
+
 
   const handleClose = () => {
     setOpen(false);
-    setSelectedProduct(null);
-    setOpenalert(false)
   };
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-  const totalAmount = cart.reduce((total, item) => total + item.price * item.quantity, 0);
+  const handleAddToCart = () => {
+    addToCart(productDetails, quantity);
+    setOpen(false);
+  };
+  
+  //const totalAmount = cart.reduce((total, item) => total + item.price * item.quantity, 0);
   
   
+
   
   const getTodayDay = () => {
     const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
@@ -240,9 +250,16 @@ console.log(selectedProduct, "this is selected produts")
     return daysOfWeek[today === 0 ? 6 : today - 1]; 
   };
 
+
+
   const todayDay = getTodayDay();
-  const todayHours = deliveryTimes[todayDay];
   
+  const todayHours = deliveryTimes[todayDay];
+
+
+
+
+
 
   useEffect(() => {
     const result = menu.filter(item =>
@@ -251,7 +268,11 @@ console.log(selectedProduct, "this is selected produts")
     setFilteredMenu(result);
   }, [searchTerm, menu]);
 
+
   
+
+
+
   useEffect(() => {
     // Flatten the nested arrays and filter based on search term
     const result = itemsByCategory.flatMap(categoryArray =>
@@ -267,45 +288,116 @@ console.log(selectedProduct, "this is selected produts")
 
 
 
+
+
   // Handle search input change
   const handleSearchChange = (event) => {
     setSearchTerm(event.target.value);
   };
+
+
+
+
 
   // Handle snackbar close
   const handleClosedfilter = () => {
     setOpenalert(false);
   };
 
-  // Function to check if any item in the category matches the search term
-  const categoryMatchesSearch = (menuIndex) => {
-    if (!itemsByCategory[menuIndex]) return false;
 
-    return itemsByCategory[menuIndex].some(category =>
-      category.some(item =>
-        item.itemTitle.toLowerCase().includes(searchTerm.toLowerCase())
-      )
-    );
+
+
+
+
+
+
+  const handleExpand = (menuIndex) => {
+    setExpanded(prevExpanded => {
+      if (prevExpanded.includes(menuIndex)) {
+        return prevExpanded;
+      } else {
+        return [...prevExpanded, menuIndex];
+      }
+    });
   };
+  
 
+
+  useEffect(() => {
+    const updatedExpanded = menu
+      .map((_, menuIndex) => {
+        if (categoryMatchesSearch(menuIndex)) {
+          return menuIndex;
+        }
+        return null;
+      })
+      .filter(menuIndex => menuIndex !== null);
+  
+    setExpanded(updatedExpanded);
+  }, [searchTerm, itemsByCategory, menu]);
+  
 
   
   useEffect(() => {
-    // Open the dialog on component mount
+  sessionStorage.setItem('id',id)
     setOpen(true);
   }, []);
 
-  const handleClosedialog = () => {
-    setOpen(false);
-  };
 
-  console.log(selectedProduct, 'this is selected product')
+
+const getFilteredItemsByCategory = () => {
+  return itemsByCategory.map((categories, menuIndex) => {
+    return categories.map((items, categoryIndex) => {
+      return items.filter(item =>
+        item.itemTitle.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    });
+  });
+};
+
+
+const filteredItemsByCategory = getFilteredItemsByCategory();
+
+
+
+
+const categoryMatchesSearch = (menuIndex) => {
+  if (!filteredItemsByCategory[menuIndex]) return false;
+
+  return filteredItemsByCategory[menuIndex].some(items =>
+    items.length > 0
+  );
+};
+
+
+
+const isItemAvailable = (availableTimes) => {
+  if (!availableTimes) {
+    return false;  
+  }
+
+
+
+  
+  const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+  const now = new Date();
+  const currentDay = daysOfWeek[now.getDay()];
+  const currentTime = now.getHours() + ":" + now.getMinutes().toString().padStart(2, "0");
+
+  if (availableTimes[currentDay]) {
+    const { start, end } = availableTimes[currentDay];
+    return currentTime >= start && currentTime <= end;
+  }
+  return false; 
+};
+
+
+
+
   return (
     <>
   
-    
-      
-
+  
      <Box sx={{ 
   backgroundColor: '#000', 
   color: '#fff', 
@@ -327,30 +419,21 @@ console.log(selectedProduct, "this is selected produts")
   <Grid container justifyContent="center" alignItems="center" spacing={2}>
     <Grid item>
       <Typography 
+      
         variant="body1" 
         sx={{ 
           fontSize: '1.2rem', 
           fontWeight: 'medium', 
           marginRight: '10px' 
         }}
+        
       >
+     <HomeIcon/>
         {address}
+       
       </Typography>
     </Grid>
 
-    <Grid item>
-      <Typography 
-        variant="body1" 
-        sx={{ 
-          fontSize: '1.2rem', 
-          fontWeight: 'medium', 
-          marginLeft: '10px', 
-          marginRight: '10px'
-        }}
-      >
-        |
-      </Typography>
-    </Grid>
 
     <Grid item>
       <Typography 
@@ -361,23 +444,11 @@ console.log(selectedProduct, "this is selected produts")
           marginLeft: '10px' 
         }}
       >
+      <PhoneIcon/>
         {phone}
       </Typography>
     </Grid>
 
-    <Grid item>
-      <Typography 
-        variant="body1" 
-        sx={{ 
-          fontSize: '1.2rem', 
-          fontWeight: 'medium', 
-          marginLeft: '10px', 
-          marginRight: '10px' 
-        }}
-      >
-        |
-      </Typography>
-    </Grid>
 
     <Grid item>
   <Typography 
@@ -390,23 +461,20 @@ console.log(selectedProduct, "this is selected produts")
       alignItems: 'center'
     }}
   >
-    {todayHours 
-      ? ` ${todayDay} ${todayHours.start} to ${todayHours.end}` 
-      : (
-        <>       
-          <img 
-            src={Closedimg}
-            alt="Closed" 
-            style={{ width: '44px', height: '44px', marginRight: '8px',  }}
-          />
-        </>
-      )}
+  <AccessTimeFilledIcon/>
+   <select>
+        {Object.entries(deliveryTimes).map(([day, times]) => (
+          <option key={day} value={day} selected={day === todayDay}>
+            {day}: {times.start} - {times.end}
+          </option>
+        ))}
+      </select>
   </Typography>
 </Grid>
   </Grid>
 </Box>
       <Sidebaraddtocart  cart={selectedProduct} />
-<Box sx={{ display: 'flex', justifyContent: 'flex-start', padding: '20px', marginLeft: '10px' }}>
+        <Box sx={{ display: 'flex', justifyContent: 'flex-start', padding: '20px', marginLeft: '10px' }}>
         <TextField
           value={searchTerm}
           onChange={handleSearchChange}
@@ -420,11 +488,7 @@ console.log(selectedProduct, "this is selected produts")
           }}
         />
       </Box>
-      {/* <ul>
-        {filteredItems.map((item, index) => (
-          <li key={index}>{item.itemTitle}</li>
-        ))}
-      </ul> */}
+      
       <Snackbar
         sx={{ marginTop: '50px' }}
         open={openalert}
@@ -437,103 +501,83 @@ console.log(selectedProduct, "this is selected produts")
         </Alert>
       </Snackbar>
 
+
+
       {/* Accordion Display */}
       <div className="shop-container">
-    <div className="shop">
-    {menu.map((menuTitle, menuIndex) => (
-          <div key={menuIndex}>
-            {categoryMatchesSearch(menuIndex) && (
-              <>
-                <Typography variant="h5" className="menu-title">{menuTitle}</Typography>
-                {categoriesByMenu[menuIndex].map((category, categoryIndex) => (
-                  <Accordion key={category._id}>
-                    <AccordionSummary expandIcon={<AddIcon />}>
-                      <Typography>{category.categoryTitle}</Typography>
-                    </AccordionSummary>
-                    <AccordionDetails>
-                      {itemsByCategory[menuIndex][categoryIndex].map((item) => (
-                        <div key={item._id} className="menu-item">
+     <div className="shop">
+    {menu
+    .map((menuTitle, menuIndex) => (
+      <div key={menuIndex}>
+        {categoryMatchesSearch(menuIndex) && (
+          <>
+            <Typography variant="h5" className="menu-title">{menuTitle}</Typography>
+            {categoriesByMenu[menuIndex]
+            //.filter(category => category.status === "true")
+            .map((category, categoryIndex) => (
+              <Accordion
+                key={category._id}
+                expanded={expanded.includes(menuIndex)}
+                onChange={() => handleExpand(menuIndex)}
+              >
+                <AccordionSummary expandIcon={<AddIcon />}>
+                  <Typography>{category.categoryTitle}</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                    {filteredItemsByCategory[menuIndex][categoryIndex]
+                     // .filter(item => item.status === "true")
+                      .filter(item => isItemAvailable(item.availableTimes))
+                      .map(item => (
+                        <div key={item._id} className="menu-item hand-cursor">
                           <Typography variant="body1">{item.itemTitle}</Typography>
                           <Typography variant="body2">${item.itemPrice}</Typography>
-                          <Button onClick={() => handleClickOpen(item)}>Add to Cart</Button>
+                          <div onClick={() => handleClickOpen(item)}>
+                            <Typography variant="body1" style={{ cursor: "pointer" }}>
+                              Select
+                            </Typography>
+                          </div>
                         </div>
                       ))}
-                    </AccordionDetails>
-                  </Accordion>
-                ))}
-              </>
-            )}
-          </div>
-        ))}
-    
+                  </AccordionDetails>
+
+              </Accordion>
+            ))}
+          {productDetails && (
+        <Dialog open={open} onClose={handleClose} sx={{height:'400px'}}>
+          <DialogTitle sx={{ background: 'black', color: 'whitesmoke', textAlign: 'center' }}>
+            {productDetails.itemTitle}
+          </DialogTitle>
+          <DialogTitle>Optionals:</DialogTitle>
+          <DialogContent>
+            {productDetails.modifiers.map((item, index) => (
+              <Box key={index} sx={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
+                <Checkbox />
+                <Typography sx={{ marginLeft: '8px' }}>{item.name}</Typography>
+                <Typography sx={{ marginLeft: '8px' }}>${item.price}</Typography>
+              </Box>
+            ))}
+            <Box>
+            <Typography sx={{ display:'flex', justifyContent:'center', marginTop:'20px', color:'red' }}>${cartTotal}</Typography>
+            </Box>
+          </DialogContent>
+          <DialogActions>
+            <Button variant="contained" onClick={handleClose} color="error">
+              Close
+            </Button>
+            <Button variant="contained" onClick={handleAddToCart} color="success">
+              Add to Cart
+            </Button>
+          </DialogActions>
+        </Dialog>
+      )}
+
+          </>
+        )}
+      </div>
+    ))}
+  </div>
 </div>
 
-    </div>
-
-
-    <Box 
-      sx={{ 
-        backgroundColor: '#4a4a4a',  // Dark gray background
-        color: '#fff',  // White text
-        padding: '20px', 
-        textAlign: 'center'
-      }}
-    >
-      {/* Restaurant Name */}
-      <Typography 
-        variant="h6" 
-        sx={{ 
-          fontWeight: 'bold', 
-          marginBottom: '10px' 
-        }}
-      >
-       {restarurentName}
-      </Typography>
-      
-      {/* Address */}
-      <Typography 
-        variant="body1" 
-        sx={{ 
-          marginBottom: '10px',
-          fontSize: '1rem',
-        }}
-      >
-        {address}
-      </Typography>
-      
-      {/* ADA Compliance Message */}
-      <Typography 
-        variant="body2" 
-        sx={{ 
-          marginBottom: '10px',
-          fontSize: '0.9rem'
-        }}
-      >
-        ADA Compliance
-      </Typography>
-      <Typography 
-        variant="body2" 
-        sx={{ 
-          fontSize: '0.9rem',
-          marginBottom: '20px'
-        }}
-      >
-        Accessibility Compliance and Support Options: If you have a hard time viewing items on this webpage, we provide instant support to read menu items AND accept orders over the phone, call us at...
-      </Typography>
-      
-      {/* Divider Line */}
-      <Divider sx={{ backgroundColor: '#fff', margin: '10px 0' }} />
-      
-      {/* Copyright Text */}
-      <Typography 
-        variant="body2" 
-        sx={{ 
-          fontSize: '0.8rem',
-        }}
-      >
-        © 2024 {restarurentName}.com
-      </Typography>
-    </Box>
     </>
   );
 };

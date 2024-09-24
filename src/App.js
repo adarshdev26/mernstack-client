@@ -10,6 +10,11 @@ import Registerusers from "./pages/dashboard/registerusers";
 import Userdashboard from "./pages/users/dashboard/dasboard";
 import Editregisterform from "./pages/dashboard/editrestaruentpage";
 import Menuitemsadd from "./pages/dashboard/menuitemsadd";
+import Success from "./pages/success";
+import Owner from "./pages/restarurent/main";
+import Manage_order from "./pages/restarurent/manage_order";
+import Orderbyrestarurent from "./pages/dashboard/orderbyrestarurent";
+
 function App() {
   return (
 
@@ -28,6 +33,10 @@ function App() {
         <Route path="/account" element={<Userdashboard />} />
         <Route path="/editregisterform" element={<Editregisterform />} />
         <Route path="/menuitems" element={<Menuitemsadd />} />
+        <Route path="/success" element={<Success />} />
+        <Route path="/owner_dashboard" element={<Owner />} />
+        <Route path="/orders" element={<Manage_order />} />
+        <Route path="/admin_orders" element={<Orderbyrestarurent />} />
   
         
       </Routes>

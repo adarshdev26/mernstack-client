@@ -336,32 +336,33 @@ const Restarurentform = () => {
                 Restaurant Opening Time (Weekly)
               </Typography>
               {["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"].map((day) => (
-                <Grid container key={day} spacing={1} alignItems="center">
-                  <Grid item xs={2}>
-                    <Typography variant="body2">{day}</Typography>
-                  </Grid>
-                  <Grid item xs={5}>
-                    <LocalizationProvider dateAdapter={AdapterDayjs}>
-                      <TimePicker
-                        label="Opening Time"
-                        value={formData.deliveryTimes[day].start}
-                        onChange={(newValue) => handleTimeChange(day, 'start', newValue)}
-                        renderInput={(params) => <TextField {...params} />}
-                      />
-                    </LocalizationProvider>
-                  </Grid>
-                  <Grid item xs={5}>
-                    <LocalizationProvider dateAdapter={AdapterDayjs}>
-                      <TimePicker
-                        label="Closing Time"
-                        value={formData.deliveryTimes[day].end}
-                        onChange={(newValue) => handleTimeChange(day, 'end', newValue)}
-                        renderInput={(params) => <TextField {...params} />}
-                      />
-                    </LocalizationProvider>
-                  </Grid>
-                </Grid>
-              ))}
+            <Grid container key={day} spacing={1} alignItems="center">
+              <Grid item xs={2}>
+                <Typography variant="body2">{day}</Typography>
+              </Grid>
+              <Grid item xs={5}>
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <TimePicker
+                    label="Opening Time"
+                    value={formData.deliveryTimes[day]?.start || null}
+                    onChange={(newValue) => handleTimeChange(day, 'start', newValue)}
+                    renderInput={(params) => <TextField {...params} />}
+                  />
+                </LocalizationProvider>
+              </Grid>
+              <Grid item xs={5}>
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <TimePicker
+                    label="Closing Time"
+                    value={formData.deliveryTimes[day]?.end || null}
+                    onChange={(newValue) => handleTimeChange(day, 'end', newValue)}
+                    renderInput={(params) => <TextField {...params} />}
+                  />
+                </LocalizationProvider>
+              </Grid>
+            </Grid>
+          ))}
+
             </Grid>
 
             {/* Sixth Row */}

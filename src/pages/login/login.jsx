@@ -32,12 +32,14 @@ export function LoginForm() {
         setOpen(true); 
         const username = response.data.user.username;
         const role = response.data.user.role;
+        const restarurent_id = response.data.user.restarurent_id;
         sessionStorage.setItem('username',username);
         sessionStorage.setItem('role',role);
+        sessionStorage.setItem('id',restarurent_id);
         if(role === 'admin') {
         navigate('/dashboard');
         }else {
-          navigate('/')
+          navigate('/owner_dashboard')
         }
       })
       .catch(error => {

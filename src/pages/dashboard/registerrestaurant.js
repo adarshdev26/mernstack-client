@@ -72,7 +72,7 @@ const RestaurantTable = () => {
 
   const handleEdit = (id) => {
     console.log('Edit restaurant with ID:', id);
-    navigate(`/editregisterform?${id}`);
+    navigate(`/admin_orders?id=${id}`);
   };
 
   const handleDelete = (id)=> {
@@ -116,10 +116,10 @@ const RestaurantTable = () => {
             margin="normal"
             value={search}
             onChange={handleSearchChange}
-            sx={{ width: 300 }}  // Adjust width as needed
+            sx={{ width: 300 }} 
           />
         </Box>
-        <Table sx={{ minWidth: 600 }} aria-label="simple table"> {/* Increase minWidth to ensure the table has enough width */}
+        <Table sx={{ minWidth: 600 }} aria-label="simple table">
           <TableHead>
             <TableRow>
               <TableCell>Id</TableCell>
@@ -154,7 +154,7 @@ const RestaurantTable = () => {
                     variant='contained'
                     onClick={() => handleEdit(restaurant._id)}  
                   >
-                    Edit
+                    see orders
                   </Button>
                    <Button
                     variant="contained"
